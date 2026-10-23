@@ -8,8 +8,8 @@
 		<version>4.1.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.blackboard</groupId>
-	<artifactId>br</artifactId>
+	<groupId>br.com</groupId>
+	<artifactId>blackboard</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>
