@@ -1,6 +1,5 @@
-<img width="2361" height="446" alt="logo_dark" src="https://github.com/user-attachments/assets/6fde627c-2c91-41ab-884c-b8e748326856" /> 
+<img width="3527" height="663" alt="logo_github_escuro" src="https://github.com/user-attachments/assets/fb5793c2-658a-4e80-8017-d9362f3ca8b0" /> 
 
- 
 
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 ![Java](https://img.shields.io/badge/Java-language-ED8B00?logo=openjdk&logoColor=white)
