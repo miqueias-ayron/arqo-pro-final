@@ -10,4 +10,5 @@
 O *Blackboard* é um **LMS**, *Learning Management System* ou sistema de gestão de aprendizagem usado por universidades no mundo todo, inclusive pelo Insper, como ambiente virtual das disciplinasm e este repositório contém uma versão simplificada da plataforma, desenvolvida em Java como projeto final da disciplina de *Arquitetura de Objetos e Times Ágeis* - Prof. Eduardo Felipe Zambom Santana
 
 # Entity-Relationship Diagram
-<img width="1000" alt="db_blackboard_clone" src="https://github.com/user-attachments/assets/5a337786-1feb-4877-80f6-d2a6a88c2ae3" />
+<img width="3920" height="5850" alt="banco_atualizado" src="https://github.com/user-attachments/assets/25b96ae8-944a-40d5-8858-c01dab8d2770" />
+
