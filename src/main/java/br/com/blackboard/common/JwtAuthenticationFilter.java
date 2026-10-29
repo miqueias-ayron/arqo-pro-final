@@ -1,7 +1,7 @@
 package br.com.blackboard.common;
 
-import aps.campeonato.usuario.JwtService;
-import aps.campeonato.usuario.UsuarioService;
+import br.com.blackboard.usuario.JwtService;
+import br.com.blackboard.usuario.UsuarioService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
