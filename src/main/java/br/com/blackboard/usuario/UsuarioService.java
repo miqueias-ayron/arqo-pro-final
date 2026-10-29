@@ -40,6 +40,7 @@ public class UsuarioService implements UserDetailsService {
                 .builder()
                 .username(userDTO.getEmail())
                 .password(userDTO.getSenha())
+                .roles(userDTO.getPerfil().name())
                 .build();
     }
 
