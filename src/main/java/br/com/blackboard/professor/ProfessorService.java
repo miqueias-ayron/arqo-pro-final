@@ -1,5 +1,6 @@
 package br.com.blackboard.professor;
 
+import br.com.blackboard.usuario.Perfil;
 import br.com.blackboard.usuario.Usuario;
 import br.com.blackboard.usuario.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ public class ProfessorService {
         Usuario usuario = new Usuario();
         usuario.setEmail(request.getEmail());
         usuario.setSenha(passwordEncoder.encode(request.getSenha()));
+        usuario.setPerfil(Perfil.PROFESSOR);
         usuario = usuarioRepository.save(usuario);
 
         Professor professor = new Professor();
