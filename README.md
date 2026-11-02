@@ -9,6 +9,31 @@
 # Blackboard
 O *Blackboard* é um **LMS**, *Learning Management System* ou sistema de gestão de aprendizagem usado por universidades no mundo todo, inclusive pelo Insper, como ambiente virtual das disciplinasm e este repositório contém uma versão simplificada da plataforma, desenvolvida em Java como projeto final da disciplina de *Arquitetura de Objetos e Times Ágeis* - Prof. Eduardo Felipe Zambom Santana
 
+# Como executar
+Pré-requisito: JDK 25 ou superior, com o `JAVA_HOME` apontando para ele. Execute os comandos na raiz do projeto.
+
+Crie o arquivo `.env` a partir do `.env.example` e preencha as variáveis. As variáveis `DB_*` são usadas apenas com PostgreSQL.
+
+```powershell
+Copy-Item .env.example .env
+```
+
+### PostgreSQL
+O banco informado em `DB_URL` precisa existir. As tabelas são criadas ao iniciar a aplicação.
+
+```powershell
+.\mvnw spring-boot:run
+```
+
+### H2
+Usa um banco local salvo na pasta `data/`, sem necessidade de instalar um servidor.
+
+```powershell
+.\mvnw spring-boot:run -Dspring-boot.run.profiles=h2
+```
+
+Com a aplicação em execução, a API fica disponível em `http://localhost:8081` e a documentação em `http://localhost:8081/swagger-ui.html`.
+
 # Entity-Relationship Diagram
 <img width="3920" height="5850" alt="banco_atualizado" src="https://github.com/user-attachments/assets/25b96ae8-944a-40d5-8858-c01dab8d2770" />
 
