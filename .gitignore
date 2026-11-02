@@ -34,3 +34,6 @@ build/
 
 ### Env ###
 .env
+
+### H2 ###
+data/

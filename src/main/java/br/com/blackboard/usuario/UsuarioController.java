@@ -2,8 +2,10 @@ package br.com.blackboard.usuario;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -13,9 +15,9 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping("/usuarios")
-    public Usuario createUser(@Valid @RequestBody Usuario createUsuarioDTO) {
-        return usuarioService
-                .create(createUsuarioDTO);
+    @ResponseStatus(HttpStatus.CREATED)
+    public UsuarioResponse createUser(@Valid @RequestBody UsuarioRequest request) {
+        return usuarioService.create(request);
     }
 
     @PostMapping("/login")

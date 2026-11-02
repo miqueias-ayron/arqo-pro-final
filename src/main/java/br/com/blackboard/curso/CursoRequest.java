@@ -1,12 +1,14 @@
 package br.com.blackboard.curso;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public class CursoRequest {
 
     @NotBlank(message = "Nome não pode ser nulo nem vazio")
+    @Size(max = 255)
     private String nome;
 
     @Positive(message = "Quantidade de semestres deve ser positiva")

@@ -1,6 +1,7 @@
 package br.com.blackboard.evento;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 public class EventoRequest {
 
     @NotBlank(message = "Nome não pode ser nulo nem vazio")
+    @Size(max = 255)
     private String nome;
 
     @NotNull(message = "Data e hora não podem ser nulas")

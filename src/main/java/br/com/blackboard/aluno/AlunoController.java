@@ -28,8 +28,8 @@ public class AlunoController {
     }
 
     @GetMapping("/{id}")
-    public AlunoResponse findById(@PathVariable int id) {
-        return alunoService.findById(id);
+    public AlunoResponse findById(@PathVariable int id, @AuthenticationPrincipal UserDetails usuario) {
+        return alunoService.findById(id, usuario);
     }
 
     @PostMapping("/{id}/organizacoes/{idOrganizacao}")

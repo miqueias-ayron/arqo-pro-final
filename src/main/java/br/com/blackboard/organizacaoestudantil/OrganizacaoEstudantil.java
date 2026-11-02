@@ -2,6 +2,7 @@ package br.com.blackboard.organizacaoestudantil;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -15,10 +16,12 @@ public class OrganizacaoEstudantil {
 
     @NotBlank
     @Column(nullable = false)
+    @Size(max = 255)
     private String nome;
 
     @NotBlank
     @Column(nullable = false)
+    @Size(max = 255)
     private String tipo;
 
     @NotNull

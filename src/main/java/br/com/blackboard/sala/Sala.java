@@ -2,6 +2,7 @@ package br.com.blackboard.sala;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Positive;
 
 @Entity(name = "tb_sala")
@@ -13,10 +14,12 @@ public class Sala {
 
     @NotBlank
     @Column(nullable = false)
+    @Size(max = 255)
     private String predio;
 
     @NotBlank
     @Column(nullable = false)
+    @Size(max = 255)
     private String numero;
 
     @Positive
@@ -25,6 +28,7 @@ public class Sala {
 
     @NotBlank
     @Column(nullable = false)
+    @Size(max = 255)
     private String tipo;
 
 

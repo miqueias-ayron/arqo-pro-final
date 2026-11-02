@@ -78,10 +78,15 @@ public class AlunoService {
     }
 
     @Transactional(readOnly = true)
-    public AlunoResponse findById(int id) {
-        return alunoRepository.findById(id)
-                .map(AlunoResponse::new)
+    public AlunoResponse findById(int id, UserDetails usuario) {
+        Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado"));
+
+        if (!temPerfil(usuario, "ROLE_PROFESSOR")) {
+            validarPermissao(aluno, usuario);
+        }
+
+        return new AlunoResponse(aluno);
     }
 
     @Transactional
@@ -125,13 +130,15 @@ public class AlunoService {
         return new AlunoResponse(alunoRepository.save(aluno));
     }
 
-    // Apenas o master ou o próprio aluno podem alterar os vínculos do aluno
+    // Apenas o master ou o próprio aluno podem acessar os dados e alterar os vínculos do aluno
     private void validarPermissao(Aluno aluno, UserDetails usuario) {
-        boolean master = usuario.getAuthorities().stream()
-                .anyMatch(authority -> "ROLE_MASTER".equals(authority.getAuthority()));
-
-        if (!master && !aluno.getUsuario().getEmail().equals(usuario.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sem permissão para alterar este aluno");
+        if (!temPerfil(usuario, "ROLE_MASTER") && !aluno.getUsuario().getEmail().equals(usuario.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sem permissão para acessar este aluno");
         }
+    }
+
+    private boolean temPerfil(UserDetails usuario, String perfil) {
+        return usuario.getAuthorities().stream()
+                .anyMatch(authority -> perfil.equals(authority.getAuthority()));
     }
 }

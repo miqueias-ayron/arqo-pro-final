@@ -7,14 +7,17 @@ import jakarta.validation.constraints.Size;
 public class ProfessorRequest {
     @NotBlank
     @Email
+    @Size(max = 255)
     private String email;
 
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 6, max = 72)
     private String senha;
 
     @NotBlank
+    @Size(max = 255)
     private String nome;
+    @Size(max = 255)
     private String titulacao;
 
     public String getEmail() {
