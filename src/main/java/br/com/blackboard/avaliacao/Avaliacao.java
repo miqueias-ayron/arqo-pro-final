@@ -1,9 +1,10 @@
 package br.com.blackboard.avaliacao;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,10 +16,18 @@ public class Avaliacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotBlank
+    @Column(nullable = false)
     private String tipo;
 
+    @NotNull
+    @Column(nullable = false)
     private LocalDate data;
 
+    @NotNull
+    @DecimalMin(value = "0.00", inclusive = false)
+    @DecimalMax("1.00")
+    @Column(nullable = false, precision = 3, scale = 2)
     private BigDecimal peso;
 
     public int getId() {
