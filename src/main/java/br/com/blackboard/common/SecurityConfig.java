@@ -25,6 +25,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/usuarios", "/professores", "/alunos", "/cursos", "/salas",
                                 "/organizacoes-estudantis", "/eventos").hasRole("MASTER")
                         .requestMatchers(HttpMethod.GET, "/alunos").hasAnyRole("MASTER", "PROFESSOR")
+                        .requestMatchers(HttpMethod.POST, "/avaliacoes").hasAnyRole("MASTER", "PROFESSOR")
+                        .requestMatchers(HttpMethod.PUT, "/avaliacoes/**").hasAnyRole("MASTER", "PROFESSOR")
+                        .requestMatchers(HttpMethod.DELETE, "/avaliacoes/**").hasAnyRole("MASTER", "PROFESSOR")
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/swagger-ui.html",
                                 "/h2-console/**",
