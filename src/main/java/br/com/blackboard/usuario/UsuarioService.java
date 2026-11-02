@@ -21,12 +21,17 @@ public class UsuarioService implements UserDetailsService {
     @Autowired
     private JwtService jwtService;
 
-    public Usuario create(Usuario userDTO) {
+    public UsuarioResponse create(UsuarioRequest request) {
+        if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email já cadastrado");
+        }
 
-        userDTO.setSenha(passwordEncoder.encode(userDTO.getSenha()));
+        Usuario usuario = new Usuario();
+        usuario.setEmail(request.getEmail());
+        usuario.setSenha(passwordEncoder.encode(request.getSenha()));
+        usuario.setPerfil(request.getPerfil());
 
-        return usuarioRepository.save(userDTO);
-
+        return new UsuarioResponse(usuarioRepository.save(usuario));
     }
 
 
