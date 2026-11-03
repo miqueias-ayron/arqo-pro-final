@@ -10,6 +10,8 @@ public class EventoResponse {
     private String nome;
     private LocalDateTime dataHora;
     private int vagas;
+    private int inscritos;
+    private int vagasRestantes;
     private OrganizacaoEstudantil organizacao;
     private Sala sala;
 
@@ -18,6 +20,8 @@ public class EventoResponse {
         this.nome = evento.getNome();
         this.dataHora = evento.getDataHora();
         this.vagas = evento.getVagas();
+        this.inscritos = evento.getInscritos();
+        this.vagasRestantes = Math.max(0, evento.getVagas() - evento.getInscritos());
         this.organizacao = evento.getOrganizacao();
         this.sala = evento.getSala();
     }
@@ -44,5 +48,13 @@ public class EventoResponse {
 
     public Sala getSala() {
         return sala;
+    }
+
+    public int getInscritos() {
+        return inscritos;
+    }
+
+    public int getVagasRestantes() {
+        return vagasRestantes;
     }
 }

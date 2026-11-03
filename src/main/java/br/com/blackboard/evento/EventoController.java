@@ -1,5 +1,7 @@
 package br.com.blackboard.evento;
 
+import br.com.blackboard.aluno.AlunoResumoResponse;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,5 +29,15 @@ public class EventoController {
     @GetMapping("/eventos/{id}")
     public EventoResponse findById(@PathVariable int id) {
         return eventoService.findById(id);
+    }
+
+    @PutMapping("/eventos/{id}")
+    public EventoResponse update(@PathVariable int id, @Valid @RequestBody EventoRequest request) {
+        return eventoService.update(id, request);
+    }
+
+    @GetMapping("/eventos/{id}/inscritos")
+    public List<AlunoResumoResponse> inscritos(@PathVariable int id) {
+        return eventoService.inscritos(id);
     }
 }

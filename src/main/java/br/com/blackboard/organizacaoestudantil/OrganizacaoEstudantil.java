@@ -1,5 +1,7 @@
 package br.com.blackboard.organizacaoestudantil;
 
+import org.hibernate.annotations.Formula;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -27,6 +29,14 @@ public class OrganizacaoEstudantil {
     @NotNull
     @Column(nullable = false)
     private LocalDate dataFundacao;
+
+    // Calculado pelo banco a cada leitura; não vira coluna
+    @Formula("(select count(*) from tb_membro_organizacao m where m.id_organizacao = id)")
+    private int totalMembros;
+
+    public int getTotalMembros() {
+        return totalMembros;
+    }
 
     public int getId() {
         return id;

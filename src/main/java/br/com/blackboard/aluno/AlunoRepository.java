@@ -3,6 +3,7 @@ package br.com.blackboard.aluno;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -14,4 +15,8 @@ public interface AlunoRepository extends JpaRepository<Aluno, Integer> {
     Optional<Aluno> findByUsuarioEmail(String email);
 
     long countByEventosId(int idEvento);
+
+    List<Aluno> findByOrganizacoesIdOrderByNome(int idOrganizacao);
+
+    List<Aluno> findByEventosIdOrderByNome(int idEvento);
 }

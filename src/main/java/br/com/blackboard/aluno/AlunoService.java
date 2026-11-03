@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Service
@@ -121,6 +123,10 @@ public class AlunoService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Aluno já inscrito no evento");
         }
 
+        if (evento.getDataHora().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O evento já aconteceu");
+        }
+
         if (alunoRepository.countByEventosId(idEvento) >= evento.getVagas()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Evento sem vagas disponíveis");
         }
@@ -164,6 +170,34 @@ public class AlunoService {
         aluno.setRa(request.getRa());
         aluno.setDataIngresso(request.getDataIngresso());
         aluno.setCurso(curso);
+        return new AlunoResponse(alunoRepository.save(aluno));
+    }
+
+    @Transactional
+    public AlunoResponse removeOrganizacao(int id, int idOrganizacao, UserDetails usuario) {
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado"));
+
+        validarPermissao(aluno, usuario);
+
+        if (!aluno.getOrganizacoes().removeIf(organizacao -> organizacao.getId() == idOrganizacao)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não é membro da organização");
+        }
+
+        return new AlunoResponse(alunoRepository.save(aluno));
+    }
+
+    @Transactional
+    public AlunoResponse removeEvento(int id, int idEvento, UserDetails usuario) {
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado"));
+
+        validarPermissao(aluno, usuario);
+
+        if (!aluno.getEventos().removeIf(evento -> evento.getId() == idEvento)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não está inscrito no evento");
+        }
+
         return new AlunoResponse(alunoRepository.save(aluno));
     }
 }
