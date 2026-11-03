@@ -13,8 +13,8 @@ public class NotaController {
     private NotaService notaService;
 
     @PostMapping("/notas")
-    public NotaResponse lancar(@Valid @RequestBody NotaRequest request) {
-        return notaService.lancar(request);
+    public NotaResponse lancar(@Valid @RequestBody NotaRequest request, @AuthenticationPrincipal UserDetails usuario) {
+        return notaService.lancar(request, usuario);
     }
 
     @GetMapping("/matriculas/{idMatricula}/notas")

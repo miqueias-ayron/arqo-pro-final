@@ -831,6 +831,51 @@
           ]
         },
         {
+          "name": "Criar segundo professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/professores",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "professores"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"professor2-{{sufixo}}@blackboard.com\",\n  \"senha\": \"senha123\",\n  \"nome\": \"Outro Professor\",\n  \"titulacao\": \"Mestre\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"idProfessor2\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Criar professor com email duplicado",
           "request": {
             "method": "POST",
@@ -2669,6 +2714,51 @@
           ]
         },
         {
+          "name": "Criar disciplina do segundo professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/disciplinas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disciplinas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"OUT{{sufixo}}\",\n  \"nome\": \"Banco de Dados\",\n  \"cargaHoraria\": 60,\n  \"idProfessor\": \"{{idProfessor2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"idDisciplina2\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Criar disciplina com código repetido",
           "request": {
             "method": "POST",
@@ -3136,6 +3226,51 @@
                   "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
                   "if (pm.response.code === 201) {",
                   "    pm.collectionVariables.set(\"idTurma2\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar turma do segundo professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/turmas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "turmas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"T1\",\n  \"semestre\": \"2026.2\",\n  \"horario\": \"QUI 19:00-21:00\",\n  \"idDisciplina\": \"{{idDisciplina2}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"idTurma3\", pm.response.json().id);",
                   "}"
                 ]
               }
@@ -4141,6 +4276,51 @@
           ]
         },
         {
+          "name": "Criar avaliação na turma do segundo professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/avaliacoes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "avaliacoes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"Prova de banco\",\n  \"data\": \"2026-11-20\",\n  \"peso\": 0.5,\n  \"idTurma\": \"{{idTurma3}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"idAvaliacaoTurma3\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Criar avaliação na segunda turma",
           "request": {
             "method": "POST",
@@ -4283,6 +4463,51 @@
                   "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
                   "if (pm.response.code === 201) {",
                   "    pm.collectionVariables.set(\"idMatricula2\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar matrícula em turma do segundo professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/matriculas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "matriculas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idAluno\": \"{{idAluno2}}\",\n  \"idTurma\": \"{{idTurma3}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"idMatricula3\", pm.response.json().id);",
                   "}"
                 ]
               }
@@ -4491,6 +4716,37 @@
                   "    pm.expect(lista[0].semestre).to.eql(\"2026.2\");",
                   "    pm.expect(lista[0].nomeDisciplina).to.eql(\"Arquitetura de Objetos\");",
                   "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Master lista todas as matrículas do aluno",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno2}}/matriculas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno2}}",
+                "matriculas"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Duas matrículas\", () => pm.expect(pm.response.json().length).to.eql(2));"
                 ]
               }
             }
@@ -6968,6 +7224,132 @@
           ]
         },
         {
+          "name": "Professor só vê matrículas das próprias turmas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno2}}/matriculas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno2}}",
+                "matriculas"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "O aluno também está numa turma do segundo professor, que fica de fora."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Só a matrícula da turma do professor\", () => {",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista.length).to.eql(1);",
+                  "    pm.expect(lista[0].idTurma).to.eql(Number(pm.collectionVariables.get(\"idTurma\")));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não lista turma de outro professor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/turmas/{{idTurma3}}/matriculas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "turmas",
+                "{{idTurma3}}",
+                "matriculas"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não vê boletim de turma de outro professor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/matriculas/{{idMatricula3}}/notas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "matriculas",
+                "{{idMatricula3}}",
+                "notas"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Professor vê boletim",
           "request": {
             "method": "GET",
@@ -7308,6 +7690,309 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não cria avaliação em turma de outro professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/avaliacoes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "avaliacoes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"Prova intrusa\",\n  \"data\": \"2026-11-20\",\n  \"peso\": 0.1,\n  \"idTurma\": \"{{idTurma3}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não altera avaliação de outro professor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/avaliacoes/{{idAvaliacaoTurma3}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "avaliacoes",
+                "{{idAvaliacaoTurma3}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"Prova de banco\",\n  \"data\": \"2026-11-20\",\n  \"peso\": 0.5,\n  \"idTurma\": \"{{idTurma3}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não move avaliação para turma de outro professor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/avaliacoes/{{idAvaliacaoTurma2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "avaliacoes",
+                "{{idAvaliacaoTurma2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"Prova única\",\n  \"data\": \"2026-11-20\",\n  \"peso\": 0.1,\n  \"idTurma\": \"{{idTurma3}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não exclui avaliação de outro professor",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/avaliacoes/{{idAvaliacaoTurma3}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "avaliacoes",
+                "{{idAvaliacaoTurma3}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não lança nota em turma de outro professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idMatricula\": \"{{idMatricula3}}\",\n  \"idAvaliacao\": \"{{idAvaliacaoTurma3}}\",\n  \"valor\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não atualiza frequência em turma de outro professor",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/matriculas/{{idMatricula3}}/frequencia",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "matriculas",
+                "{{idMatricula3}}",
+                "frequencia"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"frequencia\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
                 ]
               }
             }
@@ -7716,6 +8401,11 @@
       "type": "string"
     },
     {
+      "key": "idProfessor2",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "idCurso",
       "value": "",
       "type": "string"
@@ -7756,12 +8446,22 @@
       "type": "string"
     },
     {
+      "key": "idDisciplina2",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "idTurma",
       "value": "",
       "type": "string"
     },
     {
       "key": "idTurma2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idTurma3",
       "value": "",
       "type": "string"
     },
@@ -7786,6 +8486,11 @@
       "type": "string"
     },
     {
+      "key": "idAvaliacaoTurma3",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "idAvaliacaoProfessor",
       "value": "",
       "type": "string"
@@ -7797,6 +8502,11 @@
     },
     {
       "key": "idMatricula2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idMatricula3",
       "value": "",
       "type": "string"
     }

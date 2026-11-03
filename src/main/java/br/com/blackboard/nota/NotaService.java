@@ -2,6 +2,7 @@ package br.com.blackboard.nota;
 
 import br.com.blackboard.avaliacao.Avaliacao;
 import br.com.blackboard.avaliacao.AvaliacaoRepository;
+import br.com.blackboard.common.Permissoes;
 import br.com.blackboard.matricula.Matricula;
 import br.com.blackboard.matricula.MatriculaRepository;
 import br.com.blackboard.matricula.StatusMatricula;
@@ -28,8 +29,9 @@ public class NotaService {
     private AvaliacaoRepository avaliacaoRepository;
 
     @Transactional
-    public NotaResponse lancar(NotaRequest request) {
+    public NotaResponse lancar(NotaRequest request, UserDetails usuario) {
         Matricula matricula = buscarMatricula(request.getIdMatricula());
+        Permissoes.exigirMasterOuProfessorDaTurma(usuario, matricula.getTurma());
         Avaliacao avaliacao = avaliacaoRepository.findById(request.getIdAvaliacao())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
 
@@ -53,10 +55,11 @@ public class NotaService {
     public BoletimResponse boletim(int idMatricula, UserDetails usuario) {
         Matricula matricula = buscarMatricula(idMatricula);
 
-        // Aluno só vê o próprio boletim; master e professor veem qualquer um
-        boolean ehAluno = usuario.getAuthorities().stream()
-                .anyMatch(authority -> "ROLE_ALUNO".equals(authority.getAuthority()));
-        if (ehAluno && !matricula.getAluno().getUsuario().getEmail().equals(usuario.getUsername())) {
+        // Master vê qualquer boletim; professor só das turmas em que dá aula; aluno só o próprio
+        boolean permitido = Permissoes.temPerfil(usuario, "MASTER")
+                || (Permissoes.temPerfil(usuario, "PROFESSOR") && Permissoes.ehProfessorDaTurma(usuario, matricula.getTurma()))
+                || matricula.getAluno().getUsuario().getEmail().equals(usuario.getUsername());
+        if (!permitido) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sem permissão para ver este boletim");
         }
 

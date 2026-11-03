@@ -2,6 +2,7 @@ package br.com.blackboard.matricula;
 
 import br.com.blackboard.aluno.Aluno;
 import br.com.blackboard.aluno.AlunoRepository;
+import br.com.blackboard.common.Permissoes;
 import br.com.blackboard.nota.NotaService;
 import br.com.blackboard.turma.Turma;
 import br.com.blackboard.turma.TurmaRepository;
@@ -47,9 +48,10 @@ public class MatriculaService {
     }
 
     @Transactional
-    public MatriculaResponse atualizarFrequencia(int id, FrequenciaRequest request) {
+    public MatriculaResponse atualizarFrequencia(int id, FrequenciaRequest request, UserDetails usuario) {
         Matricula matricula = matriculaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Matrícula não encontrada"));
+        Permissoes.exigirMasterOuProfessorDaTurma(usuario, matricula.getTurma());
 
         matricula.setFrequencia(request.getFrequencia());
         notaService.recalcularStatus(matricula);
@@ -57,27 +59,32 @@ public class MatriculaService {
         return new MatriculaResponse(matricula);
     }
 
-    // Aluno só vê as próprias matrículas; master e professor veem as de qualquer aluno
+    // Master vê todas; professor só as das turmas em que dá aula; aluno só as próprias
     @Transactional(readOnly = true)
     public List<MatriculaResponse> findByAluno(int idAluno, UserDetails usuario) {
         Aluno aluno = alunoRepository.findById(idAluno)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado"));
 
-        boolean ehAluno = usuario.getAuthorities().stream()
-                .anyMatch(authority -> "ROLE_ALUNO".equals(authority.getAuthority()));
-        if (ehAluno && !aluno.getUsuario().getEmail().equals(usuario.getUsername())) {
+        boolean ehMaster = Permissoes.temPerfil(usuario, "MASTER");
+        boolean ehProfessor = Permissoes.temPerfil(usuario, "PROFESSOR");
+        if (!ehMaster && !ehProfessor && !aluno.getUsuario().getEmail().equals(usuario.getUsername())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sem permissão para ver as matrículas deste aluno");
         }
 
         return matriculaRepository.findByAlunoIdOrderById(idAluno).stream()
+                .filter(matricula -> !ehProfessor || Permissoes.ehProfessorDaTurma(usuario, matricula.getTurma()))
                 .map(MatriculaResponse::new)
                 .toList();
     }
 
+    // Master vê qualquer turma; professor só as turmas em que dá aula
     @Transactional(readOnly = true)
-    public List<MatriculaResponse> findByTurma(int idTurma) {
-        if (!turmaRepository.existsById(idTurma)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada");
+    public List<MatriculaResponse> findByTurma(int idTurma, UserDetails usuario) {
+        Turma turma = turmaRepository.findById(idTurma)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada"));
+
+        if (!Permissoes.temPerfil(usuario, "MASTER") && !Permissoes.ehProfessorDaTurma(usuario, turma)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sem permissão para ver as matrículas desta turma");
         }
 
         return matriculaRepository.findByTurmaIdOrderByAlunoNome(idTurma).stream()

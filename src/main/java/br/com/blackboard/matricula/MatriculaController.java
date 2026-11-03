@@ -22,8 +22,9 @@ public class MatriculaController {
     }
 
     @PatchMapping("/matriculas/{id}/frequencia")
-    public MatriculaResponse atualizarFrequencia(@PathVariable int id, @Valid @RequestBody FrequenciaRequest request) {
-        return matriculaService.atualizarFrequencia(id, request);
+    public MatriculaResponse atualizarFrequencia(@PathVariable int id, @Valid @RequestBody FrequenciaRequest request,
+                                                 @AuthenticationPrincipal UserDetails usuario) {
+        return matriculaService.atualizarFrequencia(id, request, usuario);
     }
 
     @GetMapping("/alunos/{idAluno}/matriculas")
@@ -32,7 +33,7 @@ public class MatriculaController {
     }
 
     @GetMapping("/turmas/{idTurma}/matriculas")
-    public List<MatriculaResponse> findByTurma(@PathVariable int idTurma) {
-        return matriculaService.findByTurma(idTurma);
+    public List<MatriculaResponse> findByTurma(@PathVariable int idTurma, @AuthenticationPrincipal UserDetails usuario) {
+        return matriculaService.findByTurma(idTurma, usuario);
     }
 }

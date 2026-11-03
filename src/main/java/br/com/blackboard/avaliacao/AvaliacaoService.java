@@ -2,10 +2,12 @@ package br.com.blackboard.avaliacao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import br.com.blackboard.common.Permissoes;
 import br.com.blackboard.turma.Turma;
 import br.com.blackboard.turma.TurmaRepository;
 
@@ -22,9 +24,9 @@ public class AvaliacaoService {
     private TurmaRepository turmaRepository;
 
     @Transactional
-    public AvaliacaoResponse create(AvaliacaoRequest request) {
+    public AvaliacaoResponse create(AvaliacaoRequest request, UserDetails usuario) {
         Avaliacao avaliacao = new Avaliacao();
-        preencher(avaliacao, request);
+        preencher(avaliacao, request, usuario);
         return new AvaliacaoResponse(avaliacaoRepository.save(avaliacao));
     }
 
@@ -41,15 +43,19 @@ public class AvaliacaoService {
     }
 
     @Transactional
-    public AvaliacaoResponse update(int id, AvaliacaoRequest request) {
+    public AvaliacaoResponse update(int id, AvaliacaoRequest request, UserDetails usuario) {
         Avaliacao avaliacao = buscar(id);
-        preencher(avaliacao, request);
+        // Precisa ter acesso à turma atual e, se trocar, também à nova
+        Permissoes.exigirMasterOuProfessorDaTurma(usuario, avaliacao.getTurma());
+        preencher(avaliacao, request, usuario);
         return new AvaliacaoResponse(avaliacaoRepository.save(avaliacao));
     }
 
     @Transactional
-    public void delete(int id) {
-        avaliacaoRepository.delete(buscar(id));
+    public void delete(int id, UserDetails usuario) {
+        Avaliacao avaliacao = buscar(id);
+        Permissoes.exigirMasterOuProfessorDaTurma(usuario, avaliacao.getTurma());
+        avaliacaoRepository.delete(avaliacao);
     }
 
     private Avaliacao buscar(int id) {
@@ -58,9 +64,10 @@ public class AvaliacaoService {
                         "Avaliação não encontrada"));
     }
 
-    private void preencher(Avaliacao avaliacao, AvaliacaoRequest request) {
+    private void preencher(Avaliacao avaliacao, AvaliacaoRequest request, UserDetails usuario) {
         Turma turma = turmaRepository.findById(request.getIdTurma())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada"));
+        Permissoes.exigirMasterOuProfessorDaTurma(usuario, turma);
 
         // A soma dos pesos da turma pode ficar abaixo de 1 enquanto as avaliações são criadas, mas nunca acima
         BigDecimal soma = avaliacaoRepository.findByTurmaId(turma.getId()).stream()
