@@ -6,11 +6,19 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // Erros lançados pelos services (404, 409, 403...) levam a mensagem no campo detail,
+    // em vez do corpo padrão do Spring, que esconde o motivo
+    @ExceptionHandler(ResponseStatusException.class)
+    public ProblemDetail handleResponseStatus(ResponseStatusException e) {
+        return ProblemDetail.forStatusAndDetail(e.getStatusCode(), e.getReason());
+    }
 
     // Regras de negócio violadas nas entidades viram 400 em vez de 500
     @ExceptionHandler(IllegalArgumentException.class)

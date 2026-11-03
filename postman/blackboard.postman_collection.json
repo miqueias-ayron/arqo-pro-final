@@ -518,7 +518,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Explica o motivo\", () => pm.expect(pm.response.json().detail).to.eql(\"Email já cadastrado\"));"
                 ]
               }
             }
@@ -1041,7 +1042,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Explica o motivo\", () => pm.expect(pm.response.json().detail).to.eql(\"Professor não encontrado\"));"
                 ]
               }
             }
@@ -8656,7 +8658,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Explica o motivo\", () => pm.expect(pm.response.json().detail).to.eql(\"RA já cadastrado\"));"
                 ]
               }
             }
