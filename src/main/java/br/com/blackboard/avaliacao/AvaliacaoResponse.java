@@ -9,12 +9,18 @@ public class AvaliacaoResponse {
     private String tipo;
     private LocalDate data;
     private BigDecimal peso;
+    private int idTurma;
 
     public AvaliacaoResponse(Avaliacao avaliacao) {
+        this.idTurma = avaliacao.getTurma().getId();
         this.id = avaliacao.getId();
         this.tipo = avaliacao.getTipo();
         this.data = avaliacao.getData();
         this.peso = avaliacao.getPeso();
+    }
+
+    public int getIdTurma() {
+        return idTurma;
     }
 
     public int getId() {
