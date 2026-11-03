@@ -28,4 +28,10 @@ public class CursoController {
     public CursoResponse findById(@PathVariable int id) {
         return cursoService.findById(id);
     }
+
+    @PostMapping("/cursos/{id}/disciplinas/{idDisciplina}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CursoResponse addDisciplina(@PathVariable int id, @PathVariable int idDisciplina) {
+        return cursoService.addDisciplina(id, idDisciplina);
+    }
 }

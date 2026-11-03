@@ -46,6 +46,7 @@ public class UsuarioService implements UserDetailsService {
                 .username(userDTO.getEmail())
                 .password(userDTO.getSenha())
                 .roles(userDTO.getPerfil().name())
+                .disabled(!userDTO.isAtivo())
                 .build();
     }
 
@@ -53,7 +54,7 @@ public class UsuarioService implements UserDetailsService {
         try {
             UserDetails userDetails = this.loadUserByUsername(loginRequest.getEmail());
 
-            if (!passwordEncoder.matches(loginRequest.getSenha(), userDetails.getPassword())) {
+            if (!userDetails.isEnabled() || !passwordEncoder.matches(loginRequest.getSenha(), userDetails.getPassword())) {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ou senha inválidos");
             }
 

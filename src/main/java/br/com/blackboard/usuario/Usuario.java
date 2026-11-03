@@ -26,6 +26,10 @@ public class Usuario {
     @Column(nullable = false)
     private Perfil perfil;
 
+    // Default no banco para registros que já existiam antes da coluna
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean ativo = true;
+
     public int getId() {
         return id;
     }
@@ -48,6 +52,14 @@ public class Usuario {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 
     public Perfil getPerfil() {

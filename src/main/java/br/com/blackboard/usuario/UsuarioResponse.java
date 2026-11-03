@@ -4,11 +4,13 @@ public class UsuarioResponse {
     private int id;
     private String email;
     private Perfil perfil;
+    private boolean ativo;
 
     public UsuarioResponse(Usuario usuario) {
         this.id = usuario.getId();
         this.email = usuario.getEmail();
         this.perfil = usuario.getPerfil();
+        this.ativo = usuario.isAtivo();
     }
 
     public int getId() {
@@ -17,6 +19,10 @@ public class UsuarioResponse {
 
     public String getEmail() {
         return email;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
     }
 
     public Perfil getPerfil() {
