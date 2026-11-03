@@ -1,5 +1,7 @@
 package br.com.blackboard.evento;
 
+import org.hibernate.annotations.Formula;
+
 import br.com.blackboard.organizacaoestudantil.OrganizacaoEstudantil;
 import br.com.blackboard.sala.Sala;
 import jakarta.persistence.*;
@@ -37,6 +39,14 @@ public class Evento {
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_sala", nullable = false)
     private Sala sala;
+
+    // Calculado pelo banco a cada leitura; não vira coluna
+    @Formula("(select count(*) from tb_inscricao_evento i where i.id_evento = id)")
+    private int inscritos;
+
+    public int getInscritos() {
+        return inscritos;
+    }
 
     public int getId() {
         return id;

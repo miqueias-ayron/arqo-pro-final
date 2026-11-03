@@ -50,4 +50,16 @@ public class AlunoController {
     public AlunoResponse update(@PathVariable int id, @Valid @RequestBody AlunoUpdateRequest request) {
         return alunoService.update(id, request);
     }
+
+    @DeleteMapping("/{id}/organizacoes/{idOrganizacao}")
+    public AlunoResponse removeOrganizacao(@PathVariable int id, @PathVariable int idOrganizacao,
+                                           @AuthenticationPrincipal UserDetails usuario) {
+        return alunoService.removeOrganizacao(id, idOrganizacao, usuario);
+    }
+
+    @DeleteMapping("/{id}/eventos/{idEvento}")
+    public AlunoResponse removeEvento(@PathVariable int id, @PathVariable int idEvento,
+                                      @AuthenticationPrincipal UserDetails usuario) {
+        return alunoService.removeEvento(id, idEvento, usuario);
+    }
 }

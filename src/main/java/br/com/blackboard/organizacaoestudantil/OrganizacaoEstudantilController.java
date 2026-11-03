@@ -1,5 +1,7 @@
 package br.com.blackboard.organizacaoestudantil;
 
+import br.com.blackboard.aluno.AlunoResumoResponse;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,5 +29,15 @@ public class OrganizacaoEstudantilController {
     @GetMapping("/organizacoes-estudantis/{id}")
     public OrganizacaoEstudantil findById(@PathVariable int id) {
         return organizacaoEstudantilService.findById(id);
+    }
+
+    @PutMapping("/organizacoes-estudantis/{id}")
+    public OrganizacaoEstudantil update(@PathVariable int id, @Valid @RequestBody OrganizacaoEstudantil organizacao) {
+        return organizacaoEstudantilService.update(id, organizacao);
+    }
+
+    @GetMapping("/organizacoes-estudantis/{id}/membros")
+    public List<AlunoResumoResponse> membros(@PathVariable int id) {
+        return organizacaoEstudantilService.membros(id);
     }
 }

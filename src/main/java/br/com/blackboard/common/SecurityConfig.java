@@ -39,7 +39,9 @@ public class SecurityConfig {
                                 "/organizacoes-estudantis", "/eventos", "/disciplinas", "/turmas").hasRole("MASTER")
                         .requestMatchers(HttpMethod.POST, "/cursos/*/disciplinas/*").hasRole("MASTER")
                         .requestMatchers(HttpMethod.PUT, "/professores/*", "/alunos/*", "/cursos/*", "/salas/*",
-                                "/disciplinas/*", "/turmas/*").hasRole("MASTER")
+                                "/disciplinas/*", "/turmas/*", "/organizacoes-estudantis/*", "/eventos/*").hasRole("MASTER")
+                        .requestMatchers(HttpMethod.GET, "/organizacoes-estudantis/*/membros", "/eventos/*/inscritos")
+                                .hasRole("MASTER")
                         .requestMatchers(HttpMethod.GET, "/alunos").hasAnyRole("MASTER", "PROFESSOR")
                         .requestMatchers(HttpMethod.GET, "/turmas/*/matriculas").hasAnyRole("MASTER", "PROFESSOR")
                         .requestMatchers(HttpMethod.POST, "/avaliacoes").hasAnyRole("MASTER", "PROFESSOR")

@@ -5,10 +5,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 import java.util.Optional;
 
 @Repository
 public interface EventoRepository extends JpaRepository<Evento, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Evento> findWithLockById(int id);
+
+    boolean existsBySalaIdAndDataHora(int idSala, LocalDateTime dataHora);
+
+    boolean existsBySalaIdAndDataHoraAndIdNot(int idSala, LocalDateTime dataHora, int id);
 }

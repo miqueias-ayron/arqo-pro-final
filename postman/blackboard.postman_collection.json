@@ -62,7 +62,12 @@
                   "if (pm.response.code === 200) {",
                   "    pm.collectionVariables.set(\"token\", pm.response.json().token);",
                   "}",
-                  "pm.collectionVariables.set(\"sufixo\", String(Date.now()));"
+                  "pm.collectionVariables.set(\"sufixo\", String(Date.now()));",
+                  "// Eventos sempre no futuro: 30 e 31 dias depois de hoje, às 19h",
+                  "const daqui = (dias) => new Date(Date.now() + dias * 864e5).toISOString().slice(0, 10) + \"T19:00:00\";",
+                  "pm.collectionVariables.set(\"dataEvento\", daqui(30));",
+                  "pm.collectionVariables.set(\"dataEvento2\", daqui(31));",
+                  "pm.collectionVariables.set(\"dataPassada\", daqui(-1));"
                 ]
               }
             }
@@ -1741,13 +1746,14 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"2026-11-10T19:00:00\",\n  \"vagas\": 30,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 30,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            }
+            },
+            "description": "MASTER. Vagas até a capacidade da sala; data no futuro; uma sala por evento no mesmo horário."
           },
           "response": [],
           "event": [
@@ -1757,6 +1763,11 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Começa com todas as vagas livres\", () => {",
+                  "    const e = pm.response.json();",
+                  "    pm.expect(e.inscritos).to.eql(0);",
+                  "    pm.expect(e.vagasRestantes).to.eql(30);",
+                  "});",
                   "if (pm.response.code === 201) {",
                   "    pm.collectionVariables.set(\"idEvento\", pm.response.json().id);",
                   "}"
@@ -1786,7 +1797,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"2026-11-10T19:00:00\",\n  \"vagas\": 1,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "raw": "{\n  \"nome\": \"Oficina\",\n  \"dataHora\": \"{{dataEvento2}}\",\n  \"vagas\": 1,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1805,6 +1816,133 @@
                   "if (pm.response.code === 201) {",
                   "    pm.collectionVariables.set(\"idEventoUmaVaga\", pm.response.json().id);",
                   "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar evento com mais vagas que a sala",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento2}}\",\n  \"vagas\": 31,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Explica a capacidade\", () => pm.expect(pm.response.json().detail).to.include(\"30\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar evento no passado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataPassada}}\",\n  \"vagas\": 10,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar evento na sala ocupada no horário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 10,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
                 ]
               }
             }
@@ -1831,7 +1969,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"2026-11-10T19:00:00\",\n  \"vagas\": 0,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 0,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1873,7 +2011,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"2026-11-10T19:00:00\",\n  \"vagas\": 30,\n  \"idOrganizacao\": 999999,\n  \"idSala\": \"{{idSala}}\"\n}",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 30,\n  \"idOrganizacao\": 999999,\n  \"idSala\": \"{{idSala}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1915,7 +2053,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"2026-11-10T19:00:00\",\n  \"vagas\": 30,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": 999999\n}",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 30,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": 999999\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2566,6 +2704,384 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Evento mostra vagas restantes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Uma vaga ocupada\", () => {",
+                  "    const e = pm.response.json();",
+                  "    pm.expect(e.inscritos).to.eql(1);",
+                  "    pm.expect(e.vagasRestantes).to.eql(29);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar inscritos do evento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}/inscritos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}",
+                "inscritos"
+              ]
+            },
+            "description": "MASTER."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Aluno inscrito na lista\", () => pm.expect(pm.response.json().map(a => a.id)).to.include(Number(pm.collectionVariables.get(\"idAluno\"))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar inscritos de evento inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/999999/inscritos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "999999",
+                "inscritos"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar inscrição no evento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno}}",
+                "eventos",
+                "{{idEvento}}"
+              ]
+            },
+            "description": "MASTER ou o próprio aluno."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Sem eventos\", () => pm.expect(pm.response.json().eventos.length).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar inscrição que não existe",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno}}",
+                "eventos",
+                "{{idEvento}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Vaga volta ao cancelar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"30 vagas livres\", () => pm.expect(pm.response.json().vagasRestantes).to.eql(30));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Inscrever de novo no evento",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno}}",
+                "eventos",
+                "{{idEvento}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Organização mostra total de membros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizacoes-estudantis/{{idOrganizacao}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizacoes-estudantis",
+                "{{idOrganizacao}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Um membro\", () => pm.expect(pm.response.json().totalMembros).to.eql(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar membros da organização",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizacoes-estudantis/{{idOrganizacao}}/membros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizacoes-estudantis",
+                "{{idOrganizacao}}",
+                "membros"
+              ]
+            },
+            "description": "MASTER."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Aluno na lista\", () => pm.expect(pm.response.json().map(a => a.id)).to.include(Number(pm.collectionVariables.get(\"idAluno\"))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sair da organização",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno}}/organizacoes/{{idOrganizacao}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno}}",
+                "organizacoes",
+                "{{idOrganizacao}}"
+              ]
+            },
+            "description": "MASTER ou o próprio aluno."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Sem organizações\", () => pm.expect(pm.response.json().organizacoes.length).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sair de organização da qual não é membro",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno}}/organizacoes/{{idOrganizacao}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno}}",
+                "organizacoes",
+                "{{idOrganizacao}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Entrar de novo na organização",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno}}/organizacoes/{{idOrganizacao}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno}}",
+                "organizacoes",
+                "{{idOrganizacao}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
                 ]
               }
             }
@@ -6224,6 +6740,207 @@
           ]
         },
         {
+          "name": "Aluno não cancela inscrição de outro aluno",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno2}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno2}}",
+                "eventos",
+                "{{idEvento}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{alunoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aluno não tira outro aluno da organização",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno2}}/organizacoes/{{idOrganizacao}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno2}}",
+                "organizacoes",
+                "{{idOrganizacao}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{alunoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aluno não lista membros da organização",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizacoes-estudantis/{{idOrganizacao}}/membros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizacoes-estudantis",
+                "{{idOrganizacao}}",
+                "membros"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{alunoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aluno não lista inscritos do evento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}/inscritos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}",
+                "inscritos"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{alunoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aluno vê vagas restantes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/eventos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{alunoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Campo vagasRestantes\", () => pm.expect(pm.response.json()[0]).to.have.property(\"vagasRestantes\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Aluno vê o próprio boletim",
           "request": {
             "method": "GET",
@@ -9627,6 +10344,495 @@
           ]
         },
         {
+          "name": "Editar organização",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/organizacoes-estudantis/{{idOrganizacao}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizacoes-estudantis",
+                "{{idOrganizacao}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Atlética Unificada\",\n  \"tipo\": \"esportiva\",\n  \"dataFundacao\": \"2019-03-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Nome atualizado\", () => pm.expect(pm.response.json().nome).to.eql(\"Atlética Unificada\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar organização inválida",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/organizacoes-estudantis/{{idOrganizacao}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizacoes-estudantis",
+                "{{idOrganizacao}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar organização inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/organizacoes-estudantis/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "organizacoes-estudantis",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"X\",\n  \"tipo\": \"x\",\n  \"dataFundacao\": \"2020-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar evento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra de abertura\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 25,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Os dois alunos estão inscritos: 25 vagas, 23 livres."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Nome e vagas atualizados\", () => {",
+                  "    const e = pm.response.json();",
+                  "    pm.expect(e.nome).to.eql(\"Palestra de abertura\");",
+                  "    pm.expect(e.vagas).to.eql(25);",
+                  "    pm.expect(e.vagasRestantes).to.eql(23);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar evento com vagas abaixo dos inscritos",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 1,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar evento com mais vagas que a sala",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 46,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "A sala foi ampliada para 45 lugares na edição de salas acima."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar evento para horário ocupado na sala",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento2}}\",\n  \"vagas\": 25,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar evento para o passado",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataPassada}}\",\n  \"vagas\": 25,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar evento inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 10,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não edita evento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Palestra\",\n  \"dataHora\": \"{{dataEvento}}\",\n  \"vagas\": 25,\n  \"idOrganizacao\": \"{{idOrganizacao}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não lista inscritos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/eventos/{{idEvento}}/inscritos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "eventos",
+                "{{idEvento}}",
+                "inscritos"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Professor não edita turma",
           "request": {
             "method": "PUT",
@@ -9928,6 +11134,21 @@
     },
     {
       "key": "idEventoUmaVaga",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dataEvento",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dataEvento2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dataPassada",
       "value": "",
       "type": "string"
     },
