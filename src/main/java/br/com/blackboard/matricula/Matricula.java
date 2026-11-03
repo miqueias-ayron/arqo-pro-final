@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity(name = "tb_matricula")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"id_aluno", "id_turma"}))
@@ -19,6 +20,12 @@ public class Matricula {
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_aluno", nullable = false)
     private Aluno aluno;
+
+    private LocalDate data = LocalDate.now();
+
+    // Preenchida quando todas as avaliações da turma têm nota
+    @Column(precision = 4, scale = 2)
+    private BigDecimal mediaFinal;
 
     @NotNull
     @Column(nullable = false, precision = 5, scale = 2)
@@ -56,6 +63,22 @@ public class Matricula {
 
     public void setAluno(Aluno aluno) {
         this.aluno = aluno;
+    }
+
+    public LocalDate getData() {
+        return data;
+    }
+
+    public void setData(LocalDate data) {
+        this.data = data;
+    }
+
+    public BigDecimal getMediaFinal() {
+        return mediaFinal;
+    }
+
+    public void setMediaFinal(BigDecimal mediaFinal) {
+        this.mediaFinal = mediaFinal;
     }
 
     public BigDecimal getFrequencia() {

@@ -74,8 +74,10 @@ public class NotaService {
 
         if (somaPesos.compareTo(BigDecimal.ONE) < 0) {
             matricula.setStatus(StatusMatricula.CURSANDO);
+            matricula.setMediaFinal(null);
         } else {
             BigDecimal media = CalculadoraMedia.calcularMedia(notas);
+            matricula.setMediaFinal(media);
             matricula.setStatus(CalculadoraMedia.definirStatus(media, matricula.getFrequencia()));
         }
 

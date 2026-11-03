@@ -1,6 +1,7 @@
 package br.com.blackboard.matricula;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class MatriculaResponse {
 
@@ -8,7 +9,9 @@ public class MatriculaResponse {
     private int idAluno;
     private String nomeAluno;
     private int idTurma;
+    private LocalDate data;
     private BigDecimal frequencia;
+    private BigDecimal mediaFinal;
     private StatusMatricula status;
 
     public MatriculaResponse(Matricula matricula) {
@@ -16,7 +19,9 @@ public class MatriculaResponse {
         this.idAluno = matricula.getAluno().getId();
         this.nomeAluno = matricula.getAluno().getNome();
         this.idTurma = matricula.getTurma().getId();
+        this.data = matricula.getData();
         this.frequencia = matricula.getFrequencia();
+        this.mediaFinal = matricula.getMediaFinal();
         this.status = matricula.getStatus();
     }
 
@@ -34,6 +39,14 @@ public class MatriculaResponse {
 
     public int getIdTurma() {
         return idTurma;
+    }
+
+    public LocalDate getData() {
+        return data;
+    }
+
+    public BigDecimal getMediaFinal() {
+        return mediaFinal;
     }
 
     public BigDecimal getFrequencia() {
