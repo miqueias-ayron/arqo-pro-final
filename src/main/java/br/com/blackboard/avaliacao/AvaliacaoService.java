@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import br.com.blackboard.turma.Turma;
+import br.com.blackboard.turma.TurmaRepository;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -13,6 +17,9 @@ public class AvaliacaoService {
 
     @Autowired
     private AvaliacaoRepository avaliacaoRepository;
+
+    @Autowired
+    private TurmaRepository turmaRepository;
 
     @Transactional
     public AvaliacaoResponse create(AvaliacaoRequest request) {
@@ -52,8 +59,21 @@ public class AvaliacaoService {
     }
 
     private void preencher(Avaliacao avaliacao, AvaliacaoRequest request) {
+        Turma turma = turmaRepository.findById(request.getIdTurma())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada"));
+
+        // A soma dos pesos da turma pode ficar abaixo de 1 enquanto as avaliações são criadas, mas nunca acima
+        BigDecimal soma = avaliacaoRepository.findByTurmaId(turma.getId()).stream()
+                .filter(outra -> outra.getId() != avaliacao.getId())
+                .map(Avaliacao::getPeso)
+                .reduce(request.getPeso(), BigDecimal::add);
+        if (soma.compareTo(BigDecimal.ONE) > 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A soma dos pesos da turma não pode passar de 1");
+        }
+
         avaliacao.setTipo(request.getTipo());
         avaliacao.setData(request.getData());
         avaliacao.setPeso(request.getPeso());
+        avaliacao.setTurma(turma);
     }
 }

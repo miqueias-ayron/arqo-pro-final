@@ -7,6 +7,7 @@ public class MatriculaResponse {
     private int id;
     private int idAluno;
     private String nomeAluno;
+    private int idTurma;
     private BigDecimal frequencia;
     private StatusMatricula status;
 
@@ -14,6 +15,7 @@ public class MatriculaResponse {
         this.id = matricula.getId();
         this.idAluno = matricula.getAluno().getId();
         this.nomeAluno = matricula.getAluno().getNome();
+        this.idTurma = matricula.getTurma().getId();
         this.frequencia = matricula.getFrequencia();
         this.status = matricula.getStatus();
     }
@@ -28,6 +30,10 @@ public class MatriculaResponse {
 
     public String getNomeAluno() {
         return nomeAluno;
+    }
+
+    public int getIdTurma() {
+        return idTurma;
     }
 
     public BigDecimal getFrequencia() {

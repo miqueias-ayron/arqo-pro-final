@@ -1,12 +1,14 @@
 package br.com.blackboard.matricula;
 
 import br.com.blackboard.aluno.Aluno;
+import br.com.blackboard.turma.Turma;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 @Entity(name = "tb_matricula")
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"id_aluno", "id_turma"}))
 public class Matricula {
 
     @Id
@@ -26,6 +28,19 @@ public class Matricula {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusMatricula status = StatusMatricula.CURSANDO;
+
+    @NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_turma", nullable = false)
+    private Turma turma;
+
+    public Turma getTurma() {
+        return turma;
+    }
+
+    public void setTurma(Turma turma) {
+        this.turma = turma;
+    }
 
     public int getId() {
         return id;
