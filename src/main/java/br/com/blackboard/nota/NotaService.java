@@ -32,6 +32,17 @@ public class NotaService {
         Avaliacao avaliacao = avaliacaoRepository.findById(request.getIdAvaliacao())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
 
+        if (avaliacao.getTurma().getId() != matricula.getTurma().getId()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "A avaliação não pertence à turma da matrícula");
+        }
+
+        List<Avaliacao> avaliacoes = avaliacaoRepository.findByTurmaId(matricula.getTurma().getId());
+        if (somarPesos(avaliacoes).compareTo(BigDecimal.ONE) != 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "A soma dos pesos das avaliações da turma precisa ser 1 para lançar notas");
+        }
+
         NotaId id = new NotaId(matricula.getId(), avaliacao.getId());
         Nota nota = notaRepository.findById(id).orElseGet(Nota::new);
         nota.setId(id);
@@ -50,23 +61,29 @@ public class NotaService {
         return new BoletimResponse(matricula, notaRepository.findByMatriculaId(idMatricula));
     }
 
-    // Só define aprovado ou reprovado quando todas as avaliações (soma dos pesos = 1) têm nota
+    // Só define aprovado ou reprovado quando a turma fecha os pesos em 1 e todas as avaliações têm nota
     @Transactional
     public void recalcularStatus(Matricula matricula) {
+        List<Avaliacao> avaliacoes = avaliacaoRepository.findByTurmaId(matricula.getTurma().getId());
         List<Nota> notas = notaRepository.findByMatriculaId(matricula.getId());
 
-        BigDecimal somaPesos = notas.stream()
-                .map(nota -> nota.getAvaliacao().getPeso())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        boolean completa = somarPesos(avaliacoes).compareTo(BigDecimal.ONE) == 0
+                && notas.size() == avaliacoes.size();
 
-        if (somaPesos.compareTo(BigDecimal.ONE) < 0) {
-            matricula.setStatus(StatusMatricula.CURSANDO);
-        } else {
+        if (completa) {
             BigDecimal media = CalculadoraMedia.calcularMedia(notas);
             matricula.setStatus(CalculadoraMedia.definirStatus(media, matricula.getFrequencia()));
+        } else {
+            matricula.setStatus(StatusMatricula.CURSANDO);
         }
 
         matriculaRepository.save(matricula);
+    }
+
+    private BigDecimal somarPesos(List<Avaliacao> avaliacoes) {
+        return avaliacoes.stream()
+                .map(Avaliacao::getPeso)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private Matricula buscarMatricula(int id) {
