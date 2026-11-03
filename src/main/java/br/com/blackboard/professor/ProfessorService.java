@@ -58,4 +58,20 @@ public class ProfessorService {
                 .map(ProfessorResponse::new)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado"));
     }
+
+    @Transactional
+    public ProfessorResponse update(int id, ProfessorUpdateRequest request) {
+        Professor professor = professorRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado"));
+
+        Usuario usuario = professor.getUsuario();
+        if (usuarioRepository.existsByEmailAndIdNot(request.getEmail(), usuario.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email já cadastrado");
+        }
+
+        usuario.setEmail(request.getEmail());
+        professor.setNome(request.getNome());
+        professor.setTitulacao(request.getTitulacao());
+        return new ProfessorResponse(professorRepository.save(professor));
+    }
 }

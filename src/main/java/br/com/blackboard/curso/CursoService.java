@@ -72,4 +72,22 @@ public class CursoService {
 
         return new CursoResponse(cursoRepository.save(curso));
     }
+
+    @Transactional
+    public CursoResponse update(int id, CursoRequest request) {
+        Curso curso = cursoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso não encontrado"));
+
+        Professor coordenador = professorRepository.findById(request.getIdCoordenador())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado"));
+
+        if (cursoRepository.existsByCoordenadorIdAndIdNot(coordenador.getId(), id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Professor já é coordenador de outro curso");
+        }
+
+        curso.setNome(request.getNome());
+        curso.setDuracaoSemestres(request.getDuracaoSemestres());
+        curso.setCoordenador(coordenador);
+        return new CursoResponse(cursoRepository.save(curso));
+    }
 }

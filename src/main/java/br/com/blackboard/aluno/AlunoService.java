@@ -141,4 +141,29 @@ public class AlunoService {
         return usuario.getAuthorities().stream()
                 .anyMatch(authority -> perfil.equals(authority.getAuthority()));
     }
+
+    @Transactional
+    public AlunoResponse update(int id, AlunoUpdateRequest request) {
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado"));
+
+        Usuario usuario = aluno.getUsuario();
+        if (usuarioRepository.existsByEmailAndIdNot(request.getEmail(), usuario.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email já cadastrado");
+        }
+
+        if (alunoRepository.existsByRaAndIdNot(request.getRa(), id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "RA já cadastrado");
+        }
+
+        Curso curso = cursoRepository.findById(request.getIdCurso())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso não encontrado"));
+
+        usuario.setEmail(request.getEmail());
+        aluno.setNome(request.getNome());
+        aluno.setRa(request.getRa());
+        aluno.setDataIngresso(request.getDataIngresso());
+        aluno.setCurso(curso);
+        return new AlunoResponse(alunoRepository.save(aluno));
+    }
 }

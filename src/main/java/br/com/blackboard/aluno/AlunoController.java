@@ -45,4 +45,9 @@ public class AlunoController {
                                    @AuthenticationPrincipal UserDetails usuario) {
         return alunoService.addEvento(id, idEvento, usuario);
     }
+
+    @PutMapping("/{id}")
+    public AlunoResponse update(@PathVariable int id, @Valid @RequestBody AlunoUpdateRequest request) {
+        return alunoService.update(id, request);
+    }
 }

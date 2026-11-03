@@ -29,4 +29,9 @@ public class DisciplinaController {
         return disciplinaService.findById(id);
     }
 
+
+    @PutMapping("/disciplinas/{id}")
+    public DisciplinaResponse update(@PathVariable int id, @Valid @RequestBody DisciplinaRequest request) {
+        return disciplinaService.update(id, request);
+    }
 }

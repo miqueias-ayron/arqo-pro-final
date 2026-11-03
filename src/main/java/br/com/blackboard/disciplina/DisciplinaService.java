@@ -5,6 +5,7 @@ import br.com.blackboard.professor.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -45,5 +46,24 @@ public class DisciplinaService {
         return disciplinaRepository.findById(id)
                 .map(DisciplinaResponse::new)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada"));
+    }
+
+    @Transactional
+    public DisciplinaResponse update(int id, DisciplinaRequest request) {
+        Disciplina disciplina = disciplinaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada"));
+
+        Professor professor = professorRepository.findById(request.getIdProfessor())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado"));
+
+        if (disciplinaRepository.existsByCodigoAndIdNot(request.getCodigo(), id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Código pertence a outra disciplina cadastrada");
+        }
+
+        disciplina.setCodigo(request.getCodigo());
+        disciplina.setNome(request.getNome());
+        disciplina.setCargaHoraria(request.getCargaHoraria());
+        disciplina.setProfessor(professor);
+        return new DisciplinaResponse(disciplinaRepository.save(disciplina));
     }
 }
