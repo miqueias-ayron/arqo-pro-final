@@ -11,4 +11,8 @@ public interface TurmaRepository extends JpaRepository<Turma, Integer> {
     // a mesma sala não pode ter duas turmas no mesmo semestre e horário
     boolean existsBySalaIdAndSemestreAndHorario(int idSala, String semestre, String horario);
 
+    boolean existsByCodigoAndDisciplinaIdAndSemestreAndIdNot(String codigo, int idDisciplina, String semestre, int id);
+
+    boolean existsBySalaIdAndSemestreAndHorarioAndIdNot(int idSala, String semestre, String horario, int id);
+
 }

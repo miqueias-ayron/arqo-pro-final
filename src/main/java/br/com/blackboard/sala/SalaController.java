@@ -28,4 +28,9 @@ public class SalaController {
     public Sala findById(@PathVariable int id) {
         return salaService.findById(id);
     }
+
+    @PutMapping("/salas/{id}")
+    public Sala update(@PathVariable int id, @Valid @RequestBody Sala sala) {
+        return salaService.update(id, sala);
+    }
 }

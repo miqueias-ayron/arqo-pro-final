@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface AlunoRepository extends JpaRepository<Aluno, Integer> {
     boolean existsByRa(String ra);
 
+    boolean existsByRaAndIdNot(String ra, int id);
+
     Optional<Aluno> findByUsuarioEmail(String email);
 
     long countByEventosId(int idEvento);

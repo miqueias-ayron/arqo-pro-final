@@ -8342,6 +8342,1494 @@
         }
       ],
       "description": "Depende das pastas anteriores."
+    },
+    {
+      "name": "Edição de cadastros",
+      "item": [
+        {
+          "name": "Editar professor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/professores/{{idProfessor2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "professores",
+                "{{idProfessor2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"professor2-editado-{{sufixo}}@blackboard.com\",\n  \"nome\": \"Outra Professora\",\n  \"titulacao\": \"Doutora\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "MASTER. Altera email de acesso, nome e titulação; a senha não muda por aqui."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Dados atualizados\", () => {",
+                  "    const p = pm.response.json();",
+                  "    pm.expect(p.nome).to.eql(\"Outra Professora\");",
+                  "    pm.expect(p.titulacao).to.eql(\"Doutora\");",
+                  "    pm.expect(p.email).to.eql(`professor2-editado-${pm.collectionVariables.get(\"sufixo\")}@blackboard.com`);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login com o email novo do professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"professor2-editado-{{sufixo}}@blackboard.com\",\n  \"senha\": \"senha123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar professor com email de outro usuário",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/professores/{{idProfessor2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "professores",
+                "{{idProfessor2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"professor{{sufixo}}@blackboard.com\",\n  \"nome\": \"Outra Professora\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar professor sem nome",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/professores/{{idProfessor2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "professores",
+                "{{idProfessor2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"professor2-editado-{{sufixo}}@blackboard.com\",\n  \"nome\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar professor inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/professores/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "professores",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ninguem{{sufixo}}@blackboard.com\",\n  \"nome\": \"Ninguém\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar aluno",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"aluno2-{{sufixo}}@blackboard.com\",\n  \"nome\": \"Aluna Editada\",\n  \"ra\": \"RB{{sufixo}}\",\n  \"dataIngresso\": \"2025-08-01\",\n  \"idCurso\": \"{{idCurso}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "MASTER. Mantendo o próprio RA e email não há conflito."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Dados atualizados\", () => {",
+                  "    const a = pm.response.json();",
+                  "    pm.expect(a.nome).to.eql(\"Aluna Editada\");",
+                  "    pm.expect(a.dataIngresso).to.eql(\"2025-08-01\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar aluno com RA de outro aluno",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"aluno2-{{sufixo}}@blackboard.com\",\n  \"nome\": \"Aluna Editada\",\n  \"ra\": \"RA{{sufixo}}\",\n  \"dataIngresso\": \"2025-08-01\",\n  \"idCurso\": \"{{idCurso}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar aluno com email de outro usuário",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"aluno{{sufixo}}@blackboard.com\",\n  \"nome\": \"Aluna Editada\",\n  \"ra\": \"RB{{sufixo}}\",\n  \"dataIngresso\": \"2025-08-01\",\n  \"idCurso\": \"{{idCurso}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar aluno com curso inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"aluno2-{{sufixo}}@blackboard.com\",\n  \"nome\": \"Aluna Editada\",\n  \"ra\": \"RB{{sufixo}}\",\n  \"dataIngresso\": \"2025-08-01\",\n  \"idCurso\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar aluno inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"x{{sufixo}}@blackboard.com\",\n  \"nome\": \"X\",\n  \"ra\": \"X{{sufixo}}\",\n  \"dataIngresso\": \"2025-08-01\",\n  \"idCurso\": \"{{idCurso}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar curso",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{idCurso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{idCurso}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Ciência da Computação (noturno)\",\n  \"duracaoSemestres\": 9,\n  \"idCoordenador\": \"{{idProfessor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "MASTER. O próprio coordenador não conta como conflito."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Nome atualizado\", () => pm.expect(pm.response.json().nome).to.eql(\"Ciência da Computação (noturno)\"));",
+                  "pm.test(\"Mantém as disciplinas\", () => pm.expect(pm.response.json().disciplinas.length).to.eql(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar curso coordenado pelo segundo professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sistemas de Informação\",\n  \"duracaoSemestres\": 8,\n  \"idCoordenador\": \"{{idProfessor2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"idCurso2\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar curso com coordenador de outro curso",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{idCurso}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{idCurso}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Ciência da Computação\",\n  \"duracaoSemestres\": 8,\n  \"idCoordenador\": \"{{idProfessor2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar curso inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"X\",\n  \"duracaoSemestres\": 8,\n  \"idCoordenador\": \"{{idProfessor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar sala",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/salas/{{idSala}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "salas",
+                "{{idSala}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"predio\": \"A\",\n  \"numero\": \"{{sufixo}}\",\n  \"capacidade\": 45,\n  \"tipo\": \"laboratório\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Capacidade atualizada\", () => pm.expect(pm.response.json().capacidade).to.eql(45));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar segunda sala",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/salas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "salas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"predio\": \"B\",\n  \"numero\": \"{{sufixo}}\",\n  \"capacidade\": 20,\n  \"tipo\": \"sala\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"idSala2\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar sala para endereço de outra sala",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/salas/{{idSala2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "salas",
+                "{{idSala2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"predio\": \"A\",\n  \"numero\": \"{{sufixo}}\",\n  \"capacidade\": 20,\n  \"tipo\": \"sala\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar sala com capacidade inválida",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/salas/{{idSala2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "salas",
+                "{{idSala2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"predio\": \"B\",\n  \"numero\": \"{{sufixo}}\",\n  \"capacidade\": 0,\n  \"tipo\": \"sala\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar sala inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/salas/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "salas",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"predio\": \"Z\",\n  \"numero\": \"1\",\n  \"capacidade\": 10,\n  \"tipo\": \"sala\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar disciplina",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/disciplinas/{{idDisciplina}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disciplinas",
+                "{{idDisciplina}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"DISC{{sufixo}}\",\n  \"nome\": \"Arquitetura de Objetos\",\n  \"cargaHoraria\": 80,\n  \"idProfessor\": \"{{idProfessor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Carga horária atualizada\", () => pm.expect(pm.response.json().cargaHoraria).to.eql(80));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar disciplina com código de outra",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/disciplinas/{{idDisciplina}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disciplinas",
+                "{{idDisciplina}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"OUT{{sufixo}}\",\n  \"nome\": \"Arquitetura de Objetos\",\n  \"cargaHoraria\": 80,\n  \"idProfessor\": \"{{idProfessor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar disciplina com professor inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/disciplinas/{{idDisciplina}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disciplinas",
+                "{{idDisciplina}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"DISC{{sufixo}}\",\n  \"nome\": \"Arquitetura de Objetos\",\n  \"cargaHoraria\": 80,\n  \"idProfessor\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar disciplina inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/disciplinas/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disciplinas",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"Z{{sufixo}}\",\n  \"nome\": \"X\",\n  \"cargaHoraria\": 60,\n  \"idProfessor\": \"{{idProfessor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar turma",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/turmas/{{idTurma2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "turmas",
+                "{{idTurma2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"T2\",\n  \"semestre\": \"2026.2\",\n  \"horario\": \"TER 08:00-10:00\",\n  \"idDisciplina\": \"{{idDisciplina}}\",\n  \"idSala\": \"{{idSala2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Horário e sala atualizados\", () => {",
+                  "    const t = pm.response.json();",
+                  "    pm.expect(t.horario).to.eql(\"TER 08:00-10:00\");",
+                  "    pm.expect(t.sala.id).to.eql(Number(pm.collectionVariables.get(\"idSala2\")));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar turma mantendo os próprios dados",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/turmas/{{idTurma2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "turmas",
+                "{{idTurma2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"T2\",\n  \"semestre\": \"2026.2\",\n  \"horario\": \"TER 08:00-10:00\",\n  \"idDisciplina\": \"{{idDisciplina}}\",\n  \"idSala\": \"{{idSala2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "O próprio código e horário não contam como conflito."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar turma com código de outra turma",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/turmas/{{idTurma2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "turmas",
+                "{{idTurma2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"T1\",\n  \"semestre\": \"2026.2\",\n  \"horario\": \"TER 08:00-10:00\",\n  \"idDisciplina\": \"{{idDisciplina}}\",\n  \"idSala\": \"{{idSala2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar turma para sala ocupada no horário",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/turmas/{{idTurma2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "turmas",
+                "{{idTurma2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"T2\",\n  \"semestre\": \"2026.2\",\n  \"horario\": \"SEG 19:00-21:00\",\n  \"idDisciplina\": \"{{idDisciplina}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar turma com sala inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/turmas/{{idTurma2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "turmas",
+                "{{idTurma2}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"T2\",\n  \"semestre\": \"2026.2\",\n  \"horario\": \"SEG 19:00-21:00\",\n  \"idDisciplina\": \"{{idDisciplina}}\",\n  \"idSala\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar turma inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/turmas/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "turmas",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"T9\",\n  \"semestre\": \"2026.2\",\n  \"horario\": \"SAB 08:00-10:00\",\n  \"idDisciplina\": \"{{idDisciplina}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não edita turma",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/turmas/{{idTurma}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "turmas",
+                "{{idTurma}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"T1\",\n  \"semestre\": \"2026.2\",\n  \"horario\": \"SEG 19:00-21:00\",\n  \"idDisciplina\": \"{{idDisciplina}}\",\n  \"idSala\": \"{{idSala}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Professor não edita professor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/professores/{{idProfessor}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "professores",
+                "{{idProfessor}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"professor{{sufixo}}@blackboard.com\",\n  \"nome\": \"Professor Teste\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aluno não edita o próprio cadastro",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/alunos/{{idAluno}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alunos",
+                "{{idAluno}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"aluno{{sufixo}}@blackboard.com\",\n  \"nome\": \"Outro Nome\",\n  \"ra\": \"RA{{sufixo}}\",\n  \"dataIngresso\": \"2026-02-01\",\n  \"idCurso\": \"{{idCurso}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{alunoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Edição sem token",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/salas/{{idSala}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "salas",
+                "{{idSala}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"predio\": \"A\",\n  \"numero\": \"1\",\n  \"capacidade\": 10,\n  \"tipo\": \"sala\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "PUT exige MASTER. A senha não muda pela edição. Fica no fim porque altera dados usados nas pastas anteriores."
     }
   ],
   "variable": [
@@ -8407,6 +9895,16 @@
     },
     {
       "key": "idCurso",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idCurso2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idSala2",
       "value": "",
       "type": "string"
     },

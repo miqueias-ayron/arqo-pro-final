@@ -29,4 +29,9 @@ public class ProfessorController {
     public ProfessorResponse findById(@PathVariable int id) {
         return professorService.findById(id);
     }
+
+    @PutMapping("/{id}")
+    public ProfessorResponse update(@PathVariable int id, @Valid @RequestBody ProfessorUpdateRequest request) {
+        return professorService.update(id, request);
+    }
 }

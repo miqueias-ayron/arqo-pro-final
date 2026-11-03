@@ -30,4 +30,9 @@ public class TurmaController {
         return turmaService.findById(id);
     }
 
+
+    @PutMapping("/turmas/{id}")
+    public TurmaResponse update(@PathVariable int id, @Valid @RequestBody TurmaRequest request) {
+        return turmaService.update(id, request);
+    }
 }

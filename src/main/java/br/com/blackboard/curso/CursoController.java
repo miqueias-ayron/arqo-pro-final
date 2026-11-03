@@ -34,4 +34,9 @@ public class CursoController {
     public CursoResponse addDisciplina(@PathVariable int id, @PathVariable int idDisciplina) {
         return cursoService.addDisciplina(id, idDisciplina);
     }
+
+    @PutMapping("/cursos/{id}")
+    public CursoResponse update(@PathVariable int id, @Valid @RequestBody CursoRequest request) {
+        return cursoService.update(id, request);
+    }
 }
