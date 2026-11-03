@@ -63,11 +63,17 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
+        List<String> origens = Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .filter(origem -> !origem.isEmpty())
-                .toList());
+                .toList();
+        if (origens.isEmpty()) {
+            throw new IllegalStateException(
+                    "CORS_ALLOWED_ORIGINS está vazio: informe ao menos uma origem do front ou remova a variável para usar o padrão");
+        }
+
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(origens);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setMaxAge(3600L);

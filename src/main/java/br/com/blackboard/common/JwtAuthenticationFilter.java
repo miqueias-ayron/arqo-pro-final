@@ -40,6 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Token de um usuário que não existe mais segue como não autenticado e vira 401
                 try {
                     UserDetails userDetails = usuarioService.loadUserByUsername(username);
+                    // Usuário desativado depois de emitir o token também não autentica
+                    if (!userDetails.isEnabled()) {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
