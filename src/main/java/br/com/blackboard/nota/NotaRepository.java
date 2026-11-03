@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface NotaRepository extends JpaRepository<Nota, NotaId> {
     List<Nota> findByMatriculaId(int idMatricula);
+
+    boolean existsByAvaliacaoId(int idAvaliacao);
 }

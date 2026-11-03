@@ -20,6 +20,9 @@ public class AvaliacaoRequest {
     @Digits(integer = 1, fraction = 2)
     private BigDecimal peso;
 
+    @NotNull
+    private Integer idTurma;
+
     public String getTipo() {
         return tipo;
     }
@@ -42,5 +45,13 @@ public class AvaliacaoRequest {
 
     public void setPeso(BigDecimal peso) {
         this.peso = peso;
+    }
+
+    public Integer getIdTurma() {
+        return idTurma;
+    }
+
+    public void setIdTurma(Integer idTurma) {
+        this.idTurma = idTurma;
     }
 }

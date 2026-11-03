@@ -1,5 +1,6 @@
 package br.com.blackboard.avaliacao;
 
+import br.com.blackboard.turma.Turma;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -29,6 +30,19 @@ public class Avaliacao {
     @DecimalMax("1.00")
     @Column(nullable = false, precision = 3, scale = 2)
     private BigDecimal peso;
+
+    @NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_turma", nullable = false)
+    private Turma turma;
+
+    public Turma getTurma() {
+        return turma;
+    }
+
+    public void setTurma(Turma turma) {
+        this.turma = turma;
+    }
 
     public int getId() {
         return id;
