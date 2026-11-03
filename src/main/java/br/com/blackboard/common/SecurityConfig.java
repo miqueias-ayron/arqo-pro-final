@@ -28,6 +28,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/avaliacoes").hasAnyRole("MASTER", "PROFESSOR")
                         .requestMatchers(HttpMethod.PUT, "/avaliacoes/**").hasAnyRole("MASTER", "PROFESSOR")
                         .requestMatchers(HttpMethod.DELETE, "/avaliacoes/**").hasAnyRole("MASTER", "PROFESSOR")
+                        .requestMatchers(HttpMethod.POST, "/matriculas").hasRole("MASTER")
                         .requestMatchers(HttpMethod.POST, "/notas").hasAnyRole("MASTER", "PROFESSOR")
                         .requestMatchers(HttpMethod.PATCH, "/matriculas/*/frequencia").hasAnyRole("MASTER", "PROFESSOR")
                         .requestMatchers("/error").permitAll()
