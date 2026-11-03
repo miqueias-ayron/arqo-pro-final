@@ -3,6 +3,9 @@ package br.com.blackboard.usuario;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,4 +29,9 @@ public class UsuarioController {
     }
 
 
+
+    @GetMapping("/me")
+    public MeResponse me(@AuthenticationPrincipal UserDetails usuario) {
+        return usuarioService.me(usuario.getUsername());
+    }
 }
