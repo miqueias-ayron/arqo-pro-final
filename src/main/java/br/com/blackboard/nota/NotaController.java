@@ -2,6 +2,8 @@ package br.com.blackboard.nota;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,7 +18,7 @@ public class NotaController {
     }
 
     @GetMapping("/matriculas/{idMatricula}/notas")
-    public BoletimResponse boletim(@PathVariable int idMatricula) {
-        return notaService.boletim(idMatricula);
+    public BoletimResponse boletim(@PathVariable int idMatricula, @AuthenticationPrincipal UserDetails usuario) {
+        return notaService.boletim(idMatricula, usuario);
     }
 }

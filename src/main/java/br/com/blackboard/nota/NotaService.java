@@ -7,6 +7,7 @@ import br.com.blackboard.matricula.MatriculaRepository;
 import br.com.blackboard.matricula.StatusMatricula;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,9 +50,15 @@ public class NotaService {
     }
 
     @Transactional(readOnly = true)
-    public BoletimResponse boletim(int idMatricula) {
+    public BoletimResponse boletim(int idMatricula, UserDetails usuario) {
         Matricula matricula = buscarMatricula(idMatricula);
 
+        // Aluno só vê o próprio boletim; master e professor veem qualquer um
+        boolean ehAluno = usuario.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ALUNO".equals(authority.getAuthority()));
+        if (ehAluno && !matricula.getAluno().getUsuario().getEmail().equals(usuario.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sem permissão para ver este boletim");
+        }
 
         return new BoletimResponse(matricula, notaRepository.findByMatriculaId(idMatricula));
     }
