@@ -32,6 +32,10 @@ public class NotaService {
         Avaliacao avaliacao = avaliacaoRepository.findById(request.getIdAvaliacao())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
 
+        if (avaliacao.getTurma().getId() != matricula.getTurma().getId()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A avaliação não é da turma da matrícula");
+        }
+
         NotaId id = new NotaId(matricula.getId(), avaliacao.getId());
         Nota nota = notaRepository.findById(id).orElseGet(Nota::new);
         nota.setId(id);
@@ -47,6 +51,8 @@ public class NotaService {
     @Transactional(readOnly = true)
     public BoletimResponse boletim(int idMatricula) {
         Matricula matricula = buscarMatricula(idMatricula);
+
+
         return new BoletimResponse(matricula, notaRepository.findByMatriculaId(idMatricula));
     }
 
