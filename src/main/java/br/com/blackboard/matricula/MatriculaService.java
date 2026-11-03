@@ -48,9 +48,10 @@ public class MatriculaService {
     }
 
     @Transactional
-    public MatriculaResponse atualizarFrequencia(int id, FrequenciaRequest request) {
+    public MatriculaResponse atualizarFrequencia(int id, FrequenciaRequest request, UserDetails usuario) {
         Matricula matricula = matriculaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Matrícula não encontrada"));
+        Permissoes.exigirMasterOuProfessorDaTurma(usuario, matricula.getTurma());
 
         matricula.setFrequencia(request.getFrequencia());
         notaService.recalcularStatus(matricula);

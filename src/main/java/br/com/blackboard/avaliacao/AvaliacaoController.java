@@ -3,6 +3,8 @@ package br.com.blackboard.avaliacao;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,8 +18,8 @@ public class AvaliacaoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AvaliacaoResponse create(@Valid @RequestBody AvaliacaoRequest request) {
-        return avaliacaoService.create(request);
+    public AvaliacaoResponse create(@Valid @RequestBody AvaliacaoRequest request, @AuthenticationPrincipal UserDetails usuario) {
+        return avaliacaoService.create(request, usuario);
     }
 
     @GetMapping
@@ -31,14 +33,14 @@ public class AvaliacaoController {
     }
 
     @PutMapping("/{id}")
-    public AvaliacaoResponse update(@PathVariable int id, @Valid @RequestBody
-    AvaliacaoRequest request) {
-        return avaliacaoService.update(id, request);
+    public AvaliacaoResponse update(@PathVariable int id, @Valid @RequestBody AvaliacaoRequest request,
+                                    @AuthenticationPrincipal UserDetails usuario) {
+        return avaliacaoService.update(id, request, usuario);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable int id) {
-        avaliacaoService.delete(id);
+    public void delete(@PathVariable int id, @AuthenticationPrincipal UserDetails usuario) {
+        avaliacaoService.delete(id, usuario);
     }
 }

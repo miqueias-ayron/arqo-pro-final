@@ -29,8 +29,9 @@ public class NotaService {
     private AvaliacaoRepository avaliacaoRepository;
 
     @Transactional
-    public NotaResponse lancar(NotaRequest request) {
+    public NotaResponse lancar(NotaRequest request, UserDetails usuario) {
         Matricula matricula = buscarMatricula(request.getIdMatricula());
+        Permissoes.exigirMasterOuProfessorDaTurma(usuario, matricula.getTurma());
         Avaliacao avaliacao = avaliacaoRepository.findById(request.getIdAvaliacao())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
 
