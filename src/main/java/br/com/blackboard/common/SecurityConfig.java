@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios", "/professores", "/alunos", "/cursos", "/salas",
-                                "/organizacoes-estudantis", "/eventos").hasRole("MASTER")
+                                "/organizacoes-estudantis", "/eventos", "/disciplinas", "/turmas").hasRole("MASTER")
                         .requestMatchers(HttpMethod.GET, "/alunos").hasAnyRole("MASTER", "PROFESSOR")
                         .requestMatchers(HttpMethod.POST, "/avaliacoes").hasAnyRole("MASTER", "PROFESSOR")
                         .requestMatchers(HttpMethod.PUT, "/avaliacoes/**").hasAnyRole("MASTER", "PROFESSOR")
