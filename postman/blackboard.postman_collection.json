@@ -204,6 +204,74 @@
           ]
         },
         {
+          "name": "Usuário logado (master)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "description": "Retorna email, perfil, ativo, nome e idAluno ou idProfessor conforme o perfil."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Dados do master\", () => {",
+                  "    const me = pm.response.json();",
+                  "    pm.expect(me.email).to.eql(pm.variables.get(\"masterEmail\"));",
+                  "    pm.expect(me.perfil).to.eql(\"MASTER\");",
+                  "    pm.expect(me.ativo).to.eql(true);",
+                  "    pm.expect(me.idAluno).to.eql(null);",
+                  "    pm.expect(me.idProfessor).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Usuário logado sem token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Rota protegida sem token",
           "request": {
             "method": "GET",
@@ -361,7 +429,54 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set(\"usuarioToken\", pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Usuário sem cadastro de aluno no /me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{usuarioToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Usuário criado direto em /usuarios não tem registro de aluno vinculado."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Perfil ALUNO sem idAluno\", () => {",
+                  "    const me = pm.response.json();",
+                  "    pm.expect(me.perfil).to.eql(\"ALUNO\");",
+                  "    pm.expect(me.idAluno).to.eql(null);",
+                  "});"
                 ]
               }
             }
@@ -540,6 +655,132 @@
         }
       ],
       "description": "POST exige perfil MASTER."
+    },
+    {
+      "name": "CORS",
+      "item": [
+        {
+          "name": "Preflight de origem liberada",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://localhost:5173"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "GET"
+              },
+              {
+                "key": "Access-Control-Request-Headers",
+                "value": "authorization,content-type"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Libera a origem do front\", () => pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).to.eql(\"http://localhost:5173\"));",
+                  "pm.test(\"Libera o header Authorization\", () => pm.expect(pm.response.headers.get(\"Access-Control-Allow-Headers\").toLowerCase()).to.include(\"authorization\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preflight de origem não liberada",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://site-nao-liberado.com"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "GET"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Requisição de origem liberada",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://localhost:5173"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Header CORS na resposta\", () => pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).to.eql(\"http://localhost:5173\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Origens configuradas em CORS_ALLOWED_ORIGINS (padrão http://localhost:5173)."
     },
     {
       "name": "Professores",
@@ -5112,6 +5353,51 @@
           ]
         },
         {
+          "name": "Usuário logado (aluno)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{alunoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Dados do aluno\", () => {",
+                  "    const me = pm.response.json();",
+                  "    pm.expect(me.perfil).to.eql(\"ALUNO\");",
+                  "    pm.expect(me.idAluno).to.eql(Number(pm.collectionVariables.get(\"idAluno\")));",
+                  "    pm.expect(me.idProfessor).to.eql(null);",
+                  "    pm.expect(me.nome).to.eql(\"Aluno Teste\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Aluno vê o próprio registro",
           "request": {
             "method": "GET",
@@ -6191,6 +6477,51 @@
           ]
         },
         {
+          "name": "Usuário logado (professor)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Dados do professor\", () => {",
+                  "    const me = pm.response.json();",
+                  "    pm.expect(me.perfil).to.eql(\"PROFESSOR\");",
+                  "    pm.expect(me.idProfessor).to.eql(Number(pm.collectionVariables.get(\"idProfessor\")));",
+                  "    pm.expect(me.idAluno).to.eql(null);",
+                  "    pm.expect(me.nome).to.eql(\"Professor Teste\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Professor lista alunos",
           "request": {
             "method": "GET",
@@ -7002,6 +7333,11 @@
     },
     {
       "key": "professorToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "usuarioToken",
       "value": "",
       "type": "string"
     },

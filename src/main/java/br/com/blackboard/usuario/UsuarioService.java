@@ -1,5 +1,7 @@
 package br.com.blackboard.usuario;
 
+import br.com.blackboard.aluno.AlunoRepository;
+import br.com.blackboard.professor.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +22,12 @@ public class UsuarioService implements UserDetailsService {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private AlunoRepository alunoRepository;
+
+    @Autowired
+    private ProfessorRepository professorRepository;
 
     public UsuarioResponse create(UsuarioRequest request) {
         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -65,4 +73,19 @@ public class UsuarioService implements UserDetailsService {
         }
     }
 
+
+    public MeResponse me(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado"));
+
+        return switch (usuario.getPerfil()) {
+            case ALUNO -> alunoRepository.findByUsuarioEmail(email)
+                    .map(aluno -> new MeResponse(usuario, aluno.getId(), null, aluno.getNome()))
+                    .orElseGet(() -> new MeResponse(usuario, null, null, null));
+            case PROFESSOR -> professorRepository.findByUsuarioEmail(email)
+                    .map(professor -> new MeResponse(usuario, null, professor.getId(), professor.getNome()))
+                    .orElseGet(() -> new MeResponse(usuario, null, null, null));
+            case MASTER -> new MeResponse(usuario, null, null, null);
+        };
+    }
 }
