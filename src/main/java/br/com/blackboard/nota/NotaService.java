@@ -4,9 +4,11 @@ import br.com.blackboard.avaliacao.Avaliacao;
 import br.com.blackboard.avaliacao.AvaliacaoRepository;
 import br.com.blackboard.matricula.Matricula;
 import br.com.blackboard.matricula.MatriculaRepository;
+import br.com.blackboard.matricula.PermissaoMatricula;
 import br.com.blackboard.matricula.StatusMatricula;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -56,8 +58,9 @@ public class NotaService {
     }
 
     @Transactional(readOnly = true)
-    public BoletimResponse boletim(int idMatricula) {
+    public BoletimResponse boletim(int idMatricula, UserDetails usuario) {
         Matricula matricula = buscarMatricula(idMatricula);
+        PermissaoMatricula.validarConsulta(matricula.getAluno(), usuario);
         return new BoletimResponse(matricula, notaRepository.findByMatriculaId(idMatricula));
     }
 
