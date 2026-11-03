@@ -9,6 +9,9 @@ public class MatriculaResponse {
     private int idAluno;
     private String nomeAluno;
     private int idTurma;
+    private String codigoTurma;
+    private String semestre;
+    private String nomeDisciplina;
     private LocalDate data;
     private BigDecimal frequencia;
     private BigDecimal mediaFinal;
@@ -19,6 +22,9 @@ public class MatriculaResponse {
         this.idAluno = matricula.getAluno().getId();
         this.nomeAluno = matricula.getAluno().getNome();
         this.idTurma = matricula.getTurma().getId();
+        this.codigoTurma = matricula.getTurma().getCodigo();
+        this.semestre = matricula.getTurma().getSemestre();
+        this.nomeDisciplina = matricula.getTurma().getDisciplina().getNome();
         this.data = matricula.getData();
         this.frequencia = matricula.getFrequencia();
         this.mediaFinal = matricula.getMediaFinal();
@@ -39,6 +45,18 @@ public class MatriculaResponse {
 
     public int getIdTurma() {
         return idTurma;
+    }
+
+    public String getCodigoTurma() {
+        return codigoTurma;
+    }
+
+    public String getSemestre() {
+        return semestre;
+    }
+
+    public String getNomeDisciplina() {
+        return nomeDisciplina;
     }
 
     public LocalDate getData() {
